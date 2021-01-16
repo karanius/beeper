@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <div>
+    <h1>display</h1>
+    <p id='counter'></p>
+  </div>
+  <input id='time' placeholder="enter minute">
+  <button id='start'>START</button>
+  <button id='stop'>STOP</button>
+
+  <audio id="myAudio">
+    <source src="beep.mp3" type="audio/mpeg">
+  </audio>
+
+</body>
+
+
+
+
+<script>
+  let id
+  let count
+  let timerId
+
+
+  const timeCount = () => {
+    count = count + 1
+    document.getElementById('counter').innerText = count + ' seconds' + ' -> ' + 'Will beep in ' + document.getElementById('time').value + ' minutes'
+  }
+
+  const beep = () => {
+    console.log('beep')
+    var x = document.getElementById("myAudio");
+    x.play()
+  }
+
+  const startTheBeep = () => {
+    count = 0
+    let timeSet = document.getElementById('time').value
+    timeSet = timeSet * 60
+
+    if (timeSet) {
+      id = setInterval(beep, timeSet * 1000)
+      timerId = setInterval(timeCount, 1000)
+    }
+  }
+
+  const stopTheBeep = () => {
+    clearInterval(id)
+    clearInterval(timerId)
+  }
+
+  document.getElementById('start').addEventListener('click', startTheBeep);
+  document.getElementById('stop').addEventListener('click', stopTheBeep);
+</script>
+
+</html>
