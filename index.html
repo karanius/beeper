@@ -15,7 +15,7 @@
   <input id='time' placeholder="enter minute">
   <button id='start'>START</button>
   <button id='stop'>STOP</button>
-
+  <br />
   <audio controls id="myAudio">
     <source src="beep.mp3" type="audio/mpeg">
   </audio>
@@ -31,6 +31,14 @@
   let timerId
 
 
+  const cleanUp = () => {
+    clearInterval(id)
+    clearInterval(timerId)
+    count = 0
+    timerId = 0
+  }
+
+
   const timeCount = () => {
     count = count + 1
     document.getElementById('counter').innerText = count + ' seconds' + ' -> ' + 'Will beep in ' + document.getElementById('time').value + ' minutes'
@@ -43,6 +51,7 @@
   }
 
   const startTheBeep = () => {
+    cleanUp
     count = 0
     let timeSet = document.getElementById('time').value
     timeSet = timeSet * 60
@@ -56,6 +65,7 @@
   const stopTheBeep = () => {
     clearInterval(id)
     clearInterval(timerId)
+    cleanUp
   }
 
   document.getElementById('start').addEventListener('click', startTheBeep);
