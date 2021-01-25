@@ -4,21 +4,106 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Beeper</title>
+
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      max-width: 300px;
+      text-align: center;
+    }
+
+    #time {
+      width: 50px;
+    }
+
+    #th {
+      font-size: 15px;
+    }
+
+    #time,
+    #table {
+      /* border: 1px solid black; */
+      text-align: center;
+      /* border-bottom: 1px solid black; */
+    }
+
+    td {
+      border-bottom: 1px solid black;
+      padding-bottom: 10px;
+    }
+
+    button {
+      margin: 5px 5px;
+    }
+  </style>
 </head>
 
 <body>
   <div>
-    <h1>display</h1>
+    <h2>Beeper</h2>
     <p id='counter'></p>
+
   </div>
-  <input id='time' placeholder="enter minute">
+
+
+  <fieldset>
+    <legend>Set Initial Beeper Option</legend>
+    <label for="time">Beep every</label>
+    <input value="1" id='time'>
+    <label for="time">minute</label>
+    <!-- <input type="text" id="fname" name="fname"><br><br> -->
+
+  </fieldset>
+
+
+
+
+  <fieldset>
+    <legend>Change Speed: </legend>
+    x<span id='speedDisplay'>1</span><br />
+    <label for="myRange">faster</label>
+    <input type="range" min="0.01" max="2" value="1" step="0.01" class="slider" id="myRange">
+    <label for="myRange">slower</label>
+    <br />
+    <button id="rangeReset">reset</button>
+  </fieldset>
+  <br />
+
+
+
   <button id='start'>START</button>
   <button id='stop'>STOP</button>
+
+
   <br />
-  <audio controls id="myAudio">
-    <source src="beep.mp3" type="audio/mpeg">
+  <br />
+
+  <table id='table'>
+    <tr>
+      <th>Stats</th>
+    </tr>
+    <tr>
+      <td> <span id='totalSeconds'>0</span> seconds</td>
+    </tr>
+    <tr>
+      <td> <span id='totalBeeps'>0</span> Beeps!</td>
+    </tr>
+
+
+
+  </table>
+
+
+
+  <audio controls id="myAudio" volume="0.5">
+    <source id="myBeep" src="beep.mp3" type="audio/mpeg">
   </audio>
+
+
+
+
 
 </body>
 
@@ -26,50 +111,135 @@
 
 
 <script>
-  let id
-  let count
-  let timerId
 
 
-  const cleanUp = () => {
-    clearInterval(id)
-    clearInterval(timerId)
-    count = 0
-    timerId = 0
-  }
 
 
-  const timeCount = () => {
-    count = count + 1
-    document.getElementById('counter').innerText = count + ' seconds' + ' -> ' + 'Will beep in ' + document.getElementById('time').value + ' minutes'
-  }
 
-  const beep = () => {
-    console.log('beep')
-    var x = document.getElementById("myAudio");
-    x.play()
-  }
+  function AdjustingInterval(workFunc, interval, errorFunc) {
+    var that = this;
+    var expected, timeout;
+    this.interval = interval;
 
-  const startTheBeep = () => {
-    cleanUp
-    count = 0
-    let timeSet = document.getElementById('time').value
-    timeSet = timeSet * 60
+    this.start = function () {
+      expected = Date.now() + this.interval;
+      timeout = setTimeout(step, this.interval);
+    }
 
-    if (timeSet) {
-      id = setInterval(beep, timeSet * 1000)
-      timerId = setInterval(timeCount, 1000)
+    this.stop = function () {
+      clearTimeout(timeout);
+    }
+
+    this.beep = function () {
+      document.getElementById('myAudio').play()
+      document.getElementById('totalBeeps').innerText = Number(document.getElementById('totalBeeps').innerText) + 1
+
+    }
+
+    function step() {
+      var drift = Date.now() - expected;
+      if (drift > that.interval) {
+        // You could have some default stuff here too...
+        if (errorFunc) errorFunc();
+      }
+      workFunc();
+      expected += that.interval;
+      timeout = setTimeout(step, Math.max(0, that.interval - drift));
     }
   }
 
-  const stopTheBeep = () => {
-    clearInterval(id)
-    clearInterval(timerId)
-    cleanUp
+
+
+  // For testing purposes, we'll just increment
+  // this and send it out to the console.
+  var justSomeNumber = 0;
+
+  // Define the work to be done
+  var doWork = function () {
+    console.log(++justSomeNumber);
+    if (!(justSomeNumber % 60)) {
+      ticker.beep()
+    }
+
+    document.getElementById('totalSeconds').innerText = justSomeNumber
+  };
+
+  // Define what to do if something goes wrong
+  var doError = function () {
+    console.warn('The drift exceeded the interval.');
+  };
+
+  // (The third argument is optional)
+  var ticker = new AdjustingInterval(doWork, 1000, doError);
+
+
+  // USAGE:
+  // You can start or stop your timer at will:
+  // ticker.start();
+  // ticker.stop();
+
+  // You can also change the interval while it's in progress:
+  // ticker.interval = 99;
+
+
+
+
+
+
+  const timeCount = () => {
+    // count = count + 1
+    // document.getElementById('counter').innerText = count + ' seconds' + ' -> ' + 'Will beep in ' + document.getElementById('time').value + ' minutes'
   }
 
+  const beep = () => {
+    // var x = document.getElementById("myAudio");
+    console.log('beep!')
+    // x.play()
+  }
+
+  const startTheBeep = () => {
+    console.log('stargin the beeper')
+    ticker.start()
+  }
+
+  const stopTheBeep = () => {
+    console.log('ending the beeper')
+    ticker.stop()
+  }
+
+
+  const adjsutSlider = (e) => {
+    const el = document.getElementById('time');
+    const speedDisplay = document.getElementById('speedDisplay');
+    const numb = (e.target.value * el.value).toFixed(2);
+    console.log('adjusting SLIDER', numb);
+    speedDisplay.innerText = numb;
+    ticker.interval = numb * 1000
+    // document.getElementById("myAudio").playbackRate = numb
+  };
+
+
+  document.getElementById('myRange').oninput = adjsutSlider;
   document.getElementById('start').addEventListener('click', startTheBeep);
   document.getElementById('stop').addEventListener('click', stopTheBeep);
+
+
+  document.getElementById("myAudio").volume = 0.2;
+
+
+
+  const resetEverything = () => {
+    const speedDisplay = document.getElementById('speedDisplay');
+    speedDisplay.innerText = 1;
+    document.getElementById('myRange').value = 1;
+    document.getElementById('time').value = 1;
+    document.getElementById('totalSeconds').innerText = 0
+  };
+  document.getElementById('rangeReset').addEventListener('click', resetEverything);
+
+
+
+
 </script>
 
 </html>
