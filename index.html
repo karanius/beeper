@@ -48,14 +48,14 @@
   </div>
 
 
-  <fieldset>
-    <legend>Set Initial Beeper Option</legend>
-    <label for="time">Beep every</label>
-    <input value="1" id='time'>
-    <label for="time">minute</label>
-    <!-- <input type="text" id="fname" name="fname"><br><br> -->
+  <!-- <fieldset> -->
+  <!-- <legend>Set Initial Beeper Option</legend> -->
+  <!-- <label for="time">Beep every</label> -->
+  <!-- <input value="1" id='time'> -->
+  <!-- <label for="time">minute</label> -->
+  <!-- <input type="text" id="fname" name="fname"><br><br> -->
 
-  </fieldset>
+  <!-- </fieldset> -->
 
 
 
@@ -78,23 +78,24 @@
 
 
   <br />
-  <br />
 
   <table id='table'>
     <tr>
       <th>Stats</th>
     </tr>
     <tr>
-      <td> <span id='totalSeconds'>0</span> seconds</td>
+      <td> <span id='normalSeconds'>0</span> seconds/normal speed</td>
+    </tr>
+    <tr>
+      <td> <span id='totalSeconds'>0</span> seconds/adjusted speed</td>
     </tr>
     <tr>
       <td> <span id='totalBeeps'>0</span> Beeps!</td>
     </tr>
 
-
-
   </table>
 
+  <br />
 
 
   <audio controls id="myAudio" volume="0.5">
@@ -151,25 +152,31 @@
 
   // For testing purposes, we'll just increment
   // this and send it out to the console.
+  var justSomeNumberNormal = 0;
   var justSomeNumber = 0;
+  var initialInterval = 1000
 
   // Define the work to be done
   var doWork = function () {
-    console.log(++justSomeNumber);
+    ++justSomeNumber
     if (!(justSomeNumber % 60)) {
       ticker.beep()
     }
-
     document.getElementById('totalSeconds').innerText = justSomeNumber
   };
 
+  var doWorkNormal = function () {
+    ++justSomeNumberNormal
+    document.getElementById('normalSeconds').innerText = justSomeNumberNormal
+  }
   // Define what to do if something goes wrong
   var doError = function () {
     console.warn('The drift exceeded the interval.');
   };
 
   // (The third argument is optional)
-  var ticker = new AdjustingInterval(doWork, 1000, doError);
+  var normalTicker = new AdjustingInterval(doWorkNormal, initialInterval, doError);
+  var ticker = new AdjustingInterval(doWork, initialInterval, doError);
 
 
   // USAGE:
@@ -181,43 +188,23 @@
   // ticker.interval = 99;
 
 
-
-
-
-
-  const timeCount = () => {
-    // count = count + 1
-    // document.getElementById('counter').innerText = count + ' seconds' + ' -> ' + 'Will beep in ' + document.getElementById('time').value + ' minutes'
-  }
-
-  const beep = () => {
-    // var x = document.getElementById("myAudio");
-    console.log('beep!')
-    // x.play()
-  }
-
   const startTheBeep = () => {
     console.log('stargin the beeper')
     ticker.start()
+    normalTicker.start()
   }
 
   const stopTheBeep = () => {
     console.log('ending the beeper')
     ticker.stop()
+    normalTicker.stop()
   }
 
 
   const adjsutSlider = (e) => {
-    const el = document.getElementById('time');
     const speedDisplay = document.getElementById('speedDisplay');
-    const numb = Number((e.target.value * el.value).toFixed(2));
-    console.log('adjusting SLIDER', numb);
-    speedDisplay.innerText = numb;
-    ticker.interval = numb * 1000
-    console.log(Number((numb * 60).toFixed(2)))
-    // document.getElementById('totalBeeps').innerText = 0
-    // el.placeholder = 60 * numb
-    // document.getElementById("myAudio").playbackRate = numb
+    speedDisplay.innerText = e.target.value
+    ticker.interval = +e.target.value * 1000
   };
 
 
@@ -229,13 +216,8 @@
   document.getElementById("myAudio").volume = 0.1;
 
 
-
   const resetEverything = () => {
-    const speedDisplay = document.getElementById('speedDisplay');
-    speedDisplay.innerText = 1;
-    document.getElementById('myRange').value = 1;
-    document.getElementById('time').value = 1;
-    document.getElementById('totalSeconds').innerText = 0
+    window.location.reload()
   };
   document.getElementById('rangeReset').addEventListener('click', resetEverything);
 
