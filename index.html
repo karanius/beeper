@@ -103,6 +103,9 @@
   </audio>
 
 
+  <br />
+  <li>Will Auto-Start</li>
+  <li>Will restart every 10 beeps</li>
 
 
 
@@ -124,16 +127,22 @@
 
     this.start = function () {
       expected = Date.now() + this.interval;
-      timeout = setTimeout(step, this.interval);
+      if (!(timeout)) {
+        timeout = setTimeout(step, this.interval);
+      }
     }
 
     this.stop = function () {
       clearTimeout(timeout);
+      timeout = undefined
     }
 
     this.beep = function () {
       document.getElementById('myAudio').play()
       document.getElementById('totalBeeps').innerText = Number(document.getElementById('totalBeeps').innerText) + 1
+      if (+document.getElementById('totalBeeps').innerText > 10) {
+        window.location.reload()
+      }
     }
 
     function step() {
@@ -222,7 +231,7 @@
   document.getElementById('rangeReset').addEventListener('click', resetEverything);
 
 
-
+  startTheBeep()
 
 </script>
 
