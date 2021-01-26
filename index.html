@@ -105,7 +105,7 @@
 
   <br />
   <li>Will Auto-Start</li>
-  <li>Will restart every 10 beeps</li>
+  <li>Will refresh every 10 beeps</li>
 
 
 
@@ -212,8 +212,10 @@
 
   const adjsutSlider = (e) => {
     const speedDisplay = document.getElementById('speedDisplay');
-    speedDisplay.innerText = e.target.value
-    ticker.interval = +e.target.value * 1000
+    speedDisplay.innerText = e.target.value;
+
+    ticker.interval = +e.target.value * 1000;
+    localStorage.range = e.target.value;
   };
 
 
@@ -227,8 +229,19 @@
 
   const resetEverything = () => {
     window.location.reload()
+    localStorage.range = 1
   };
   document.getElementById('rangeReset').addEventListener('click', resetEverything);
+
+
+
+  if (localStorage && localStorage.range) {
+    document.getElementById('myRange').value = +localStorage.range
+    const speedDisplay = document.getElementById('speedDisplay');
+    speedDisplay.innerText = localStorage.range;
+    ticker.interval = localStorage.range * 1000;
+  }
+
 
 
   startTheBeep()
