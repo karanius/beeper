@@ -73,7 +73,7 @@
 
 
 
-  <button id='start'>START</button>
+  <button id='start'>RE-START</button>
   <button id='stop'>STOP</button>
 
 
@@ -220,9 +220,13 @@
 
 
   document.getElementById('myRange').oninput = adjsutSlider;
-  document.getElementById('start').addEventListener('click', startTheBeep);
   document.getElementById('stop').addEventListener('click', stopTheBeep);
 
+  // restar button
+  const restart = () => {
+    console.log(window.location.reload())
+  }
+  document.getElementById('start').addEventListener('click', restart);
 
   document.getElementById("myAudio").volume = 0.1;
 
